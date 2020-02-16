@@ -88,9 +88,9 @@ export default {
         getCarListInfo({ unionId: localStorage.id }).then(
           res => {
             if (res.code === "200") {
-              if(res.data.no !== '') {
+              if(res.data.length > 0) {
                 this.edit = true
-                this.params = res.data
+                this.params = res.data[0]
               }
             }
           }
