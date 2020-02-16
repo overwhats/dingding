@@ -1,13 +1,15 @@
 <template>
   <div class="home">
+    <van-action-sheet v-model="showTarget" :actions="targetList" @select="selectTarget" />
+    <van-action-sheet v-model="showAddress" :actions="addressList" @select="selectAddress" />
     <div class="userInfo item">
-      <div class="left"><span>储丹&nbsp;17712311232</span></div>
-      <div class="right">2020-02-17</div>
+      <div class="left"><span>{{userInfo.userName}}&nbsp;{{userInfo.userTel}}</span></div>
+      <div class="right">{{now}}</div>
     </div>
     <div class="wrap">
-      <div class="item wd van-hairline--bottom input-wrap"><div><span class="red">*</span>目的地</div><div style="color: #333333;display: flex;align-items: center;">国创<van-icon name="arrow" /></div></div>
-      <div class="item wd van-hairline--bottom input-wrap"><div><span class="red">*</span>地址</div><div style="color: #333333;display: flex;align-items: center;">武进区<van-icon name="arrow" /></div></div>
-      <div class="item wd van-hairline--bottom search-wrap"><input placeholder="请输入地址" type="text"> <div class="search-btn">查询</div></div>
+      <div @click="showTarget=true" class="item wd van-hairline--bottom input-wrap"><div><span class="red">*</span>目的地</div><div style="color: #333333;display: flex;align-items: center;">{{target}}<van-icon name="arrow" /></div></div>
+      <div @click="showAddress = true" class="item wd van-hairline--bottom input-wrap"><div><span class="red">*</span>地址</div><div style="color: #333333;display: flex;align-items: center;">{{address}}<van-icon name="arrow" /></div></div>
+      <div class="item wd van-hairline--bottom search-wrap"><input v-model="searchAddress" placeholder="请输入地址" type="text"> <div class="search-btn" @click="search">查询</div></div>
     </div>
     <ul class="address-list">
       <li>
@@ -29,9 +31,10 @@
 
 <script>
 import vue from 'vue';
-import { Button,Toast, Checkbox, CheckboxGroup, Icon } from 'vant';
+import dayjs from 'dayjs'
+import { Button,Toast, Checkbox, CheckboxGroup, Icon , ActionSheet } from 'vant';
 import {getUrlParam} from '../utils/auth'
-vue.use(Button).use(Toast).use(Checkbox).use(CheckboxGroup).use(Icon);
+vue.use(ActionSheet).use(Toast).use(Checkbox).use(CheckboxGroup).use(Icon);
 export default {
   name: 'home',
   components: {
@@ -39,17 +42,40 @@ export default {
   },
     data(){
       return{
-        checked:true
+        targetList:[
+          {name:'国创'},{name:'总部'},{name:'4s店'}
+        ],
+        addressList:[
+          {name:'武进区'},{name:'天宁区'},{name:'新北区'},{name:'钟楼区'},{name:'戚墅堰区'},{name:'溧阳区'},{name:'金坛市'}
+        ],
+        target: '总部',
+        address: '国创',
+        showTarget: false,
+        showAddress: false,
+        checked:true,
+        userInfo: {},
+        now: dayjs().format('YYYY-MM-DD'),
+        searchAddress: ''
       }
     },
     methods:{
+      selectTarget(item) {
+        this.target = item.name;
+        this.showTarget = false;
+        console.log(item.name);
+      },
+      selectAddress(item) {
+        this.address = item.name;
+        this.showAddress = false;
+        console.log(item.name);
+      },
+      search() {
 
+      }
     },
-    mounted(){
-        // (process.env.VUE_APP_LOGIN_REDIRECT_URL===window.location.href)
-        //this.createDDurl()
-        this.code=getUrlParam('code');
-    },
+  mounted(){
+    this.userInfo = JSON.parse(localStorage.userInfo);
+  },
 }
 </script>
 <style scoped lang="scss">
