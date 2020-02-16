@@ -33,7 +33,7 @@
         <div class="my-check" :class="{check: params.carState == 0}"></div><span>有空位</span>
         <div class="item wd wd-num van-hairline--bottom">
           <span>剩余可乘坐人数</span>
-          <input type="text" :disabled="params.carState == 1" v-model="params.siteCnt">
+          <input type="number" :disabled="params.carState == 1" v-model="params.siteCnt">
           <span>人</span>
         </div>
       </div>
@@ -141,7 +141,7 @@ export default {
         if (localStorage.id) {
           this.getCarInfo()
         }
-        this.userInfo = localStorage.userInfo ? JSON.parse(localStorage && localStorage.userInfo) : null;
+        this.userInfo = localStorage.userInfo ? JSON.parse(localStorage.userInfo) : null;
         // this.userInfo = {
         //   unionId: 'uj16ewmjWSQutKkWNSiPBXAiEiE',
         //   userTel: '12333333333'
