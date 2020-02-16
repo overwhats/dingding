@@ -88,26 +88,14 @@ export default {
   created() {
     this.code = getUrlParam("code");
     this.id = localStorage.id;
-    this.code = '123'
+    // this.code = '123'
     if (this.code) {
-      if (this.id) {
-        // this.getUserInfo(this.id);
-      } else {
-        getUserId({ code: this.code }).then(
-                res => {
-                  if (res.code === "200") {
-                    let userId = res.data.id;
-                    localStorage.id = userId;
-                    // this.getUserInfo(userId);
-                  } else {
-                    Toast.fail(res.text);
-                  }
-                },
-                err => {
-                  Toast.fail(err.text);
-                }
-        );
-      }
+      localStorage.code = this.code;
+      // if (this.id) {
+      //   // this.getUserInfo(this.id);
+      // } else {
+      //
+      // }
 
     }
     /*else{

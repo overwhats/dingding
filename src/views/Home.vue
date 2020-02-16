@@ -118,7 +118,7 @@
     import {Button, Toast, Checkbox, CheckboxGroup, Icon } from 'vant';
     import {getUrlParam} from '../utils/auth'
     import dayjs from 'dayjs'
-    import {inviteeList, inviteeLock, inviteeCommit, enableEvatation, userCommit, getUserInfo} from '@/api/user'
+    import {inviteeList, inviteeLock, inviteeCommit, enableEvatation, userCommit, getUserInfo, getUserId} from '@/api/user'
 
     vue.use(Button).use(Toast).use(Checkbox).use(Icon);
     export default {
@@ -151,6 +151,21 @@
             }
         },
         methods: {
+            getUserId() {
+                getUserId({ code: localStorage.code }).then(
+                    res => {
+                        if (res.code === "200") {
+                            localStorage.id = res.data.id;
+                            this.getUserInfo(res.data.id);
+                        } else {
+                            Toast.fail(res.text);
+                        }
+                    },
+                    err => {
+                        Toast.fail(err.text);
+                    }
+                );
+            },
             selectAdr(type) {
               if (this.lunchEat===false)return;
               this.lunchAddr = type;
@@ -195,16 +210,16 @@
                 } else {
                     userCommit({
                         unionId: localStorage.id,
-                        homeTemp: this.homeTemp || '37.3',
+                        homeTemp: this.homeTemp || '',
                         homeStatus: str1.join(','),
-                        watchTemp: this.watchTemp || '37.3',
+                        watchTemp: this.watchTemp || '',
                         watchStatus: str2.join(','),
-                        lunchEat: this.lunchEat ? '1' : '0',
+                        lunchEat: this.lunchEat ===true ? '1' : this.lunchEat === false ? '0' : '',
                         lunchAddr: this.lunchEat===false ? '' : this.lunchAddr,
                         // lunchAddr: '国创',
                         // dinnerEat: this.dinnerEat ? '1': '0',
                         // dinnerAddr: '国创',
-                        tripType: this.tripType ===1 ? "我开车上班" : (this.tripType ===2 ? '我要搭车' : '其他方式')
+                        tripType: this.tripType ===1 ? "我开车上班" : (this.tripType ===2 ? '我要搭车' : this.tripType === 3? '其他方式':'')
                     }).then(res => {
                             if (res.code === "200") {
                                 Toast.success('提交成功');
@@ -233,77 +248,72 @@
                 this.$router.push('/road');
             },
             getUserInfo(userId) {
-                getUserInfo({unionId: userId, date: dayjs().format('YYYY-MM-DD')}).then(res => {
+                getUserInfo({unionId: userId, date: dayjs().format('YYYY-MM-DD')}).then(res=> {
                     if (res.code === "200") {
-                        try {
-                            localStorage.userInfo = JSON.stringify(res.data[0]);
-                        } catch (e) {
-                            Toast.fail('JSON解析错误');
-                            console.log(res.data, '错误数据');
+                        this.userInfo = res.data[0];
+                        localStorage.userInfo = JSON.stringify(res.data[0]);
+                        console.log(this.userInfo, '8888888');
+
+                        if (this.userInfo.homeTemp > '37.3') {
+                            this.homeTemp = this.userInfo.homeTemp;
+                            this.homeStatus = false;
+                        } else if (this.userInfo.homeTemp > 0) {
+                            this.homeStatus = true;
+                        }
+                        if (this.userInfo.watchTemp > '37.3') {
+                            this.watchTemp = this.userInfo.watchTemp;
+                            this.watchStatus = false;
+                        } else if (this.userInfo.watchTemp > 0) {
+                            this.watchStatus = true;
+                        }
+                        if (this.userInfo.tripType === '我开车上班') {
+                            this.tripType = 1;
+                        } else if (this.userInfo.tripType === '我要搭车') {
+                            this.tripType = 2;
+                        } else if (this.userInfo.tripType === '其他方式') {
+                            this.tripType = 3;
+                        }
+                        if (this.userInfo.lunchEat || this.userInfo.lunchEat == 0) {
+                            this.lunchEat = this.userInfo.lunchEat =='1'
+                        }
+                        if (this.userInfo.lunchAddr) {
+                            this.lunchAddr = this.userInfo.lunchAddr
+                        }
+                        if(this.userInfo.homeStatus) {
+                            let array = this.userInfo.homeStatus.split(',');
+                            array.map(item => {
+                                this.ycList.forEach(item2 => {
+                                    if(item === item2.text) {
+
+                                        item2.check = true;
+                                    }
+                                })
+                            });
+                        }
+                        if(this.userInfo.watchStatus) {
+                            let array = this.userInfo.watchStatus.split(',');
+                            array.map(item => {
+                                this.mgYcList.forEach(item2 => {
+                                    if(item === item2.text) {
+                                        console.log(item2.text, item);
+                                        item2.check = true;
+                                    }
+                                })
+                            });
                         }
                     } else {
                         Toast.fail(res.text);
                     }
-                },err=> {
-                    Toast.fail(err.text);
+
                 });
             },
         },
         created() {
-            getUserInfo({unionId: localStorage.id, date: dayjs().format('YYYY-MM-DD')}).then(res=> {
-                if (res.code === "200") {
-                    this.userInfo = res.data[0];
-                    console.log(this.userInfo, '8888888');
-                    if (this.userInfo.homeTemp > '37.3') {
-                        this.homeStatus = false;
-                    } else if (this.userInfo.homeTemp > 0) {
-                        this.homeStatus = true;
-                    }
-                    if (this.userInfo.watchTemp > '37.3') {
-                        this.watchStatus = false;
-                    } else if (this.userInfo.watchTemp > 0) {
-                        this.watchStatus = true;
-                    }
-                    if (this.userInfo.tripType === '我开车上班') {
-                        this.tripType = 1;
-                    } else if (this.userInfo.tripType === '我要搭车') {
-                        this.tripType = 2;
-                    } else if (this.userInfo.tripType === '其他方式') {
-                        this.tripType = 3;
-                    }
-                    if (this.userInfo.lunchEat || this.userInfo.lunchEat == 0) {
-                        this.lunchEat = this.userInfo.lunchEat =='1'
-                    }
-                    if (this.userInfo.lunchAddr) {
-                        this.lunchAddr = this.userInfo.lunchAddr
-                    }
-                    if(this.userInfo.homeStatus) {
-                        let array = this.userInfo.homeStatus.split(',');
-                        array.map(item => {
-                            this.ycList.forEach(item2 => {
-                                if(item === item2.text) {
-
-                                    item2.check = true;
-                                }
-                            })
-                        });
-                    }
-                    if(this.userInfo.watchStatus) {
-                        let array = this.userInfo.watchStatus.split(',');
-                        array.map(item => {
-                            this.mgYcList.forEach(item2 => {
-                                if(item === item2.text) {
-                                    console.log(item2.text, item);
-                                    item2.check = true;
-                                }
-                            })
-                        });
-                    }
-                } else {
-                    Toast.fail(res.text);
-                }
-
-            });
+            if (localStorage.id) {
+                this.getUserInfo(localStorage.id);
+            } else {
+                this.getUserId(localStorage.code);
+            }
         },
     }
 </script>
