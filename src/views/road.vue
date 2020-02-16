@@ -56,7 +56,7 @@ export default {
         terminalActions: [
           { name: '总部' },
           { name: '国创' },
-          { name: '“4S”店' },
+          { name: '4S店' },
         ],
         params: {
           startArea: '武进区',
@@ -102,6 +102,9 @@ export default {
 }
 </script>
 <style scoped lang="scss">
+  input {
+    border: none !important;
+  }
   .item{
     background: #fff;
     height: 44px;

@@ -21,7 +21,7 @@
         <div class="my-check" :class="{check: params.terminal == 2}"></div><span>国创</span>
       </div>
       <div class="item wd van-hairline--bottom" @click="params.terminal = 3">
-        <div class="my-check" :class="{check: params.terminal == 3}"></div><span>“4S”店</span>
+        <div class="my-check" :class="{check: params.terminal == 3}"></div><span>4S店</span>
       </div>
     </div>
     <div class="wrap">
@@ -247,6 +247,7 @@ export default {
       flex: 1;
       text-align: right;
       margin-left: 20px;
+      border:none !important;
     }
   }
   .my-check{
