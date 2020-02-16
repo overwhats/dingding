@@ -111,7 +111,7 @@ export default {
     mounted(){
         // (process.env.VUE_APP_LOGIN_REDIRECT_URL===window.location.href)
         //this.createDDurl()
-        this.userInfo = localStorage.userInfo ? JSON.parse(localStorage.userInfo) : null;
+        this.userInfo = JSON.parse(localStorage.userInfo);
     },
 }
 </script>
