@@ -9,7 +9,7 @@
       <div class="item wd van-hairline--bottom input-wrap"><div><span class="red">*</span>车辆颜色</div><input @blur="inputBlur" placeholder="请填写颜色" type="text" v-model="params.color"></div>
       <div class="item wd van-hairline--bottom input-wrap"><div><span class="red">*</span>手机号</div><span style="color: #333333">{{userInfo ? userInfo.userTel : ''}}</span></div>
       <div class="item wd van-hairline--bottom input-wrap" @click="showAreaPicker = true"><div><span class="red">*</span>起点</div><div style="color: #333333;display: flex;align-items: center;">{{params.startArea}}<van-icon name="arrow" /></div></div>
-      <div class="item wd van-hairline--bottom input-wrap"><span></span><input @blur="inputBlur" placeholder="请填写具体地址" type="text" v-model="params.startAddr"></div>
+      <div class="item wd van-hairline--bottom input-wrap input-line"><input @blur="inputBlur" placeholder="请填写具体地址" type="text" v-model="params.startAddr"></div>
       <div class="item wd van-hairline--bottom input-wrap"><div><span class="red">*</span>出行路线</div><textarea v-model="params.route" placeholder="请描述你经过的关键性道路，用逗号隔开如：中吴大道，龙江路高架，常武路" type="text"></textarea></div>
     </div>
     <div class="wrap">
@@ -255,6 +255,12 @@ export default {
   .input-wrap{
     justify-content: space-between;
     padding-right: 12px;
+    &.input-line {
+      input {
+        width: 100%;
+        text-align: right;
+      }
+    }
     input{
       border: none;
       text-align: right;
