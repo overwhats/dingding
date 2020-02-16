@@ -21,6 +21,7 @@ const enableEvatation = (params) => get('/api/invitee/enable', params);
 const getUserId = (params) => get('/api/dingtalk/code', params);
 const carAdd = (params) => get('/api/car/add', params); // 添加车辆
 const getUserInfo = (params) => get('/api/user/get', params); // 添加车辆
+const getCarListInfo = (params) => get('/api/car/list', params); // 车辆信息-查询
 export {
 	getUserInfo,
 	carAdd,
@@ -31,5 +32,6 @@ export {
 	evaCommit,
 	progressInfo,
 	getUserId,
-	enableEvatation
+	enableEvatation,
+	getCarListInfo
 }

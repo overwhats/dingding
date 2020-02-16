@@ -1,49 +1,55 @@
 <template>
   <div class="home">
     <div class="userInfo item">
-      <div class="left"><span>储丹&nbsp;17712311232</span></div>
-      <div class="right">2020-02-17</div>
+      <div class="left"><span v-if="userInfo">{{userInfo.userName}}&nbsp;{{userInfo.userTel}}</span></div>
+      <div class="right">{{now}}</div>
     </div>
     <div class="wrap">
-      <div class="item wd van-hairline--bottom input-wrap"><div><span class="red">*</span>车牌</div><input placeholder="请填写车牌" type="text"></div>
-      <div class="item wd van-hairline--bottom input-wrap"><div><span class="red">*</span>车辆颜色</div><input placeholder="请填写颜色" type="text"></div>
-      <div class="item wd van-hairline--bottom input-wrap"><div><span class="red">*</span>手机号</div><span style="color: #333333">17712311232</span></div>
-      <div class="item wd van-hairline--bottom input-wrap"><div><span class="red">*</span>起点</div><div style="color: #333333;display: flex;align-items: center;">武进区<van-icon name="arrow" /></div></div>
-      <div class="item wd van-hairline--bottom input-wrap"><span></span><input placeholder="请填写具体地址" type="text"></div>
-      <div class="item wd van-hairline--bottom input-wrap"><div><span class="red">*</span>出行路线</div><input placeholder="请简单的描述出行路线" type="text"></div>
+      <div class="item wd van-hairline--bottom input-wrap"><div><span class="red">*</span>车牌</div><input placeholder="请填写车牌" type="text" v-model="params.no"></div>
+      <div class="item wd van-hairline--bottom input-wrap"><div><span class="red">*</span>车辆颜色</div><input placeholder="请填写颜色" type="text" v-model="params.color"></div>
+      <div class="item wd van-hairline--bottom input-wrap"><div><span class="red">*</span>手机号</div><span style="color: #333333">{{userInfo ? userInfo.userTel : ''}}</span></div>
+      <div class="item wd van-hairline--bottom input-wrap" @click="showAreaPicker = true"><div><span class="red">*</span>起点</div><div style="color: #333333;display: flex;align-items: center;">{{params.startArea}}<van-icon name="arrow" /></div></div>
+      <div class="item wd van-hairline--bottom input-wrap"><span></span><input placeholder="请填写具体地址" type="text" v-model="params.startAddr"></div>
+      <div class="item wd van-hairline--bottom input-wrap"><div><span class="red">*</span>出行路线</div><textarea v-model="params.route" placeholder="请描述你经过的关键性道路，用逗号隔开如：中吴大道，龙江路高架，常武路" type="text"></textarea></div>
     </div>
     <div class="wrap">
       <div class="item title van-hairline--bottom"><span class="red">*</span>终点</div>
-      <div class="item wd van-hairline--bottom">
-        <div class="my-check check"></div><span>总部</span>
+      <div class="item wd van-hairline--bottom" @click="params.terminal = 1">
+        <div class="my-check" :class="{check: params.terminal == 1}"></div><span>总部</span>
       </div>
-      <div class="item wd van-hairline--bottom">
-        <div class="my-check"></div><span>国创</span>
+      <div class="item wd van-hairline--bottom" @click="params.terminal = 2">
+        <div class="my-check" :class="{check: params.terminal == 2}"></div><span>国创</span>
+      </div>
+      <div class="item wd van-hairline--bottom" @click="params.terminal = 3">
+        <div class="my-check" :class="{check: params.terminal == 3}"></div><span>“4S”店</span>
       </div>
     </div>
     <div class="wrap">
       <div class="item title van-hairline--bottom"><span class="red">*</span>车辆状态</div>
-      <div class="item wd van-hairline--bottom">
-        <div class="my-check"></div><span>无空位</span>
+      <div class="item wd van-hairline--bottom" @click="params.carState = 1, params.siteCnt = ''">
+        <div class="my-check" :class="{check: params.carState == 1}"></div><span>无空位</span>
       </div>
-      <div class="item wd van-hairline--bottom">
-        <div class="my-check"></div><span>有空位</span>
-      </div>
-      <div class="item wd wd-num van-hairline--bottom">
-        <span>剩余可乘坐人数</span>
-        <input type="text">
-        <span>人</span>
+      <div class="item wd van-hairline--bottom" @click="params.carState = 0">
+        <div class="my-check" :class="{check: params.carState == 0}"></div><span>有空位</span>
+        <div class="item wd wd-num van-hairline--bottom">
+          <span>剩余可乘坐人数</span>
+          <input type="text" :disabled="params.carState == 1" v-model="params.siteCnt">
+          <span>人</span>
+        </div>
       </div>
     </div>
-    <div class="bottom">提交</div>
+    <div class="bottom" @click="submit">{{edit ? '修改' : '提交'}}</div>
+    <van-action-sheet v-model="showAreaPicker" :actions="actions" @select="onAreaSelect" />
   </div>
 </template>
 
 <script>
 import vue from 'vue';
-import { Button,Toast, Checkbox, CheckboxGroup, Icon } from 'vant';
+import { Button,Toast, Checkbox, CheckboxGroup, Icon, ActionSheet } from 'vant';
 import {getUrlParam} from '../utils/auth'
-vue.use(Button).use(Toast).use(Checkbox).use(CheckboxGroup).use(Icon);
+import { getCarListInfo, carAdd } from '@/api/user'
+import dayjs from 'dayjs'
+vue.use(Button).use(Toast).use(Checkbox).use(CheckboxGroup).use(Icon).use(ActionSheet);
 export default {
   name: 'home',
   components: {
@@ -51,23 +57,103 @@ export default {
   },
     data(){
       return{
-        checked:true
+        userInfo: null,
+        now: dayjs().format('YYYY-MM-DD'),
+        checked:true,
+        showAreaPicker: false,
+        actions: [
+          { name: '天宁区' },
+          { name: '钟楼区' },
+          { name: '戚墅堰区' },
+          { name: '新北区' },
+          { name: '武进区' },
+          { name: '溧阳市' },
+          { name: '金坛市' },
+        ],
+        params: {
+          no: '',
+          color: '',
+          startAddr: '',
+          route: '',
+          startArea: '武进区',
+          terminal: 1,
+          carState: 1,
+          siteCnt: ''
+        },
+        edit: false,
       }
     },
     methods:{
-
+      getCarInfo () {
+        getCarListInfo({ unionId: localStorage.id }).then(
+          res => {
+            if (res.code === "200") {
+              if(res.data.type !== '') {
+                this.edit = true
+                this.params = res.data
+              }
+            }
+          }
+        );
+      },
+      onAreaSelect (item) {
+        this.showAreaPicker = false;
+        this.params.startArea = item.name
+      },
+      submit () {
+        if(this.params.no == '') {
+          Toast('请填写车牌');
+          return
+        }
+        if(this.params.color == '') {
+          Toast('请填写颜色');
+          return
+        }
+        if(this.params.startAddr == '') {
+          Toast('请填写具体地址');
+          return
+        }
+        if(this.params.route == '') {
+          Toast('请填写出行路线');
+          return
+        }
+        if(this.carState== 0 && this.params.siteCnt == '') {
+          Toast('请填写剩余可乘坐人数');
+          return
+        }
+        console.log(this.params)
+        carAdd({...this.params}).then(
+          res => {
+            if (res.code === "200") {
+              console.log(res.data);
+              Toast('提交成功！');
+            } else {
+              Toast(res.text);
+            }
+          },
+          err => {
+            Toast(err.text);
+          }
+        );
+      }
     },
     mounted(){
-        // (process.env.VUE_APP_LOGIN_REDIRECT_URL===window.location.href)
-        //this.createDDurl()
-        this.code=getUrlParam('code');
+        if (localStorage.id) {
+          this.getCarInfo()
+        }
+        this.userInfo = localStorage.userInfo ? JSON.parse(localStorage && localStorage.userInfo) : null;
+        // this.userInfo = {
+        //   unionId: 'uj16ewmjWSQutKkWNSiPBXAiEiE',
+        //   userTel: '12333333333'
+        // }
+        console.log(this.userInfo)
     },
 }
 </script>
 <style scoped lang="scss">
   .item{
     background: #fff;
-    height: 44px;
+    min-height: 44px;
     display: flex;
     align-items: center;
   }
@@ -156,6 +242,11 @@ export default {
     input{
       border: none;
       text-align: right;
+    }
+    textarea {
+      flex: 1;
+      text-align: right;
+      margin-left: 20px;
     }
   }
   .my-check{

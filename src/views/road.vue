@@ -1,37 +1,35 @@
 <template>
   <div class="home">
     <div class="userInfo item">
-      <div class="left"><span>储丹&nbsp;17712311232</span></div>
-      <div class="right">2020-02-17</div>
+      <div class="left"><span v-if="userInfo">{{userInfo.userName}}&nbsp;{{userInfo.userTel}}</span></div>
+      <div class="right">{{now}}</div>
     </div>
     <div class="wrap">
-      <div class="item wd van-hairline--bottom input-wrap"><div><span class="red">*</span>目的地</div><div style="color: #333333;display: flex;align-items: center;">国创<van-icon name="arrow" /></div></div>
-      <div class="item wd van-hairline--bottom input-wrap"><div><span class="red">*</span>地址</div><div style="color: #333333;display: flex;align-items: center;">武进区<van-icon name="arrow" /></div></div>
-      <div class="item wd van-hairline--bottom search-wrap"><input placeholder="请输入地址" type="text"> <div class="search-btn">查询</div></div>
+      <div class="item wd van-hairline--bottom input-wrap" @click="showStartPicker = true"><div><span class="red">*</span>出发地</div><div style="color: #333333;display: flex;align-items: center;">{{params.startArea}}<van-icon name="arrow" /></div></div>
+      <div class="item wd van-hairline--bottom input-wrap" @click="showTerminalPicker = true"><div><span class="red">*</span>目的地</div><div style="color: #333333;display: flex;align-items: center;">{{params.endAddr}}<van-icon name="arrow" /></div></div>
+      <div class="item wd van-hairline--bottom search-wrap"><input v-model="params.startAddr" placeholder="请输入地址" type="text"> <div class="search-btn" @click="search">查询</div></div>
     </div>
-    <ul class="address-list">
-      <li>
+    <ul class="address-list" v-if="carList.length > 0">
+      <li v-for="(it, i) in carList" :key="i">
         <div>
-          <div class="top-line"><span>武进区</span>&nbsp;龙套香榭丽园5栋乙单元2802</div>
-          <div class="bottom-line">储丹&nbsp;18862144378&nbsp;苏DW125R&nbsp;红色&nbsp;国创</div>
-        </div>
-      </li>
-      <li>
-        <div>
-          <div class="top-line"><span>武进区</span>&nbsp;龙套香榭丽园5栋乙单元2802</div>
-          <div class="bottom-line">储丹&nbsp;18862144378&nbsp;苏DW125R&nbsp;红色&nbsp;国创</div>
+          <div class="top-line"><span>{{it.startArea}}</span>&nbsp;{{it.startAddr}}</div>
+          <div class="bottom-line">{{it.userName}}&nbsp;{{it.userTel}}&nbsp;{{it.no}}&nbsp;{{it.color}}&nbsp;{{it.endAddr}}</div>
         </div>
       </li>
     </ul>
-    <div class="bottom">提交</div>
+    <div v-else class="no-data">暂无数据</div>
+    <van-action-sheet v-model="showStartPicker" :actions="startActions" @select="onStartSelect" />
+    <van-action-sheet v-model="showTerminalPicker" :actions="terminalActions" @select="onTerminalSelect" />
   </div>
 </template>
 
 <script>
 import vue from 'vue';
-import { Button,Toast, Checkbox, CheckboxGroup, Icon } from 'vant';
+import { Button,Toast, Checkbox, CheckboxGroup, Icon, ActionSheet } from 'vant';
 import {getUrlParam} from '../utils/auth'
-vue.use(Button).use(Toast).use(Checkbox).use(CheckboxGroup).use(Icon);
+import { getCarListInfo } from '@/api/user'
+import dayjs from 'dayjs'
+vue.use(Button).use(Toast).use(Checkbox).use(CheckboxGroup).use(Icon).use(ActionSheet);
 export default {
   name: 'home',
   components: {
@@ -39,16 +37,65 @@ export default {
   },
     data(){
       return{
-        checked:true
+        userInfo: null,
+        checked:true,
+        showStartPicker: false,
+        now: dayjs().format('YYYY-MM-DD'),
+        startActions: [
+          { name: '天宁区' },
+          { name: '钟楼区' },
+          { name: '戚墅堰区' },
+          { name: '新北区' },
+          { name: '武进区' },
+          { name: '溧阳市' },
+          { name: '金坛市' },
+        ],
+        showTerminalPicker: false,
+        terminalActions: [
+          { name: '总部' },
+          { name: '国创' },
+          { name: '“4S”店' },
+        ],
+        params: {
+          startArea: '武进区',
+          startAddr: '',
+          endAddr: '总部',
+        },
+        carList: []
       }
     },
     methods:{
-
+      onStartSelect (item) {
+        this.showStartPicker = false;
+        this.params.startArea = item.name
+      },
+      onTerminalSelect (item) {
+        this.showTerminalPicker = false;
+        this.params.endAddr = item.name
+      },
+      search () {
+        getCarListInfo({...this.params}).then(
+          res => {
+            if (res.code === "200") {
+              if(res.data.length > 0) {
+                this.carList = res.data
+              } else {
+                this.carList = []
+              }
+            } else {
+              Toast(err.text);
+            }
+          },
+          err => {
+            Toast(err.text);
+          }
+        );
+      }
     },
     mounted(){
         // (process.env.VUE_APP_LOGIN_REDIRECT_URL===window.location.href)
         //this.createDDurl()
-        this.code=getUrlParam('code');
+        this.userInfo = localStorage.userInfo ? JSON.parse(localStorage && localStorage.userInfo) : null;
     },
 }
 </script>
@@ -187,5 +234,10 @@ export default {
     span{
       color: #3296FA;
     }
+  }
+  .no-data {
+    font-size: 15px;
+    color: #ccc;
+    margin-top: 20px;
   }
 </style>
