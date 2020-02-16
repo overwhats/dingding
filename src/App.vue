@@ -32,9 +32,14 @@ export default {
   },
   methods: {
     getUserInfo(userId) {
-      getUserInfo({unionId: userId, date: dayjs().format('YYYYMMDD')}).then(res => {
+      getUserInfo({unionId: userId, date: dayjs().format('YYYY-MM-DD')}).then(res => {
         if (res.code === "200") {
-          localStorage.userInfo = JSON.stringify(res.data[0]);
+          try {
+            localStorage.userInfo = JSON.stringify(res.data[0]);
+          } catch (e) {
+            Toast.fail('JSON解析错误');
+            console.log(res.data, '错误数据');
+          }
         } else {
           Toast.fail(res.text);
         }
@@ -83,17 +88,17 @@ export default {
   created() {
     this.code = getUrlParam("code");
     this.id = localStorage.id;
-    // this.code = '123'
+    this.code = '123'
     if (this.code) {
       if (this.id) {
-        this.getUserInfo(this.id);
+        // this.getUserInfo(this.id);
       } else {
         getUserId({ code: this.code }).then(
                 res => {
                   if (res.code === "200") {
                     let userId = res.data.id;
                     localStorage.id = userId;
-                    this.getUserInfo(userId);
+                    // this.getUserInfo(userId);
                   } else {
                     Toast.fail(res.text);
                   }
