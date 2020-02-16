@@ -162,14 +162,12 @@ export default {
         if (localStorage.id) {
           this.getCarInfo()
         }
-        this.userInfo = JSON.parse(localStorage.userInfo);
+        this.userInfo = localStorage.userInfo ? JSON.parse(localStorage.userInfo) : null;
         // this.userInfo = {
         //   unionId: 'uj16ewmjWSQutKkWNSiPBXAiEiE',
         //   userTel: '12333333333'
         // }
         this.userInfo ? (this.params.userTel = this.userInfo.userTel) : ''
-        console.log('JSON.parse(localStorage.userInfo)')
-        console.log(JSON.parse(localStorage.userInfo))
         console.log(this.userInfo)
     },
 }
