@@ -26,10 +26,22 @@ export default {
   },
   data() {
     return {
-      code: ""
+      code: "",
+      id: ''
     };
   },
   methods: {
+    getUserInfo(userId) {
+      getUserInfo({unionId: userId, date: dayjs().format('YYYYMMDD')}).then(res => {
+        if (res.code === "200") {
+          localStorage.userInfo = JSON.stringify(res.data[0]);
+        } else {
+          Toast.fail(res.text);
+        }
+      },err=> {
+        Toast.fail(err.text);
+      });
+    },
     login() {
       this.createDDurl();
     },
@@ -70,40 +82,28 @@ export default {
   },
   created() {
     this.code = getUrlParam("code");
-    // this.code= 'uj16ewmjWSQutKkWNSiPBXAiEiE'
-    // getUserInfo({unionId: this.code, date: dayjs().format('YYYYMMDD')}).then(res => {
-    //   if (res.code === "200") {
-    //     localStorage.userInfo = JSON.stringify(res.data[0]);
-    //   } else {
-    //     Toast.fail(res.text);
-    //   }
-    // },err=> {
-    //   Toast.fail(err.text);
-    // });
-    // return;
-    if (this.code&& !localStorage.id) {
-      getUserId({ code: this.code }).then(
-        res => {
-          if (res.code === "200") {
-            let userId = res.data.id;
-            localStorage.id = userId;
-            getUserInfo({unionId: userId, date: dayjs().format('YYYYMMDD')}).then(res => {
-              if (res.code === "200") {
-                localStorage.userInfo = JSON.stringify(res.data[0]);
-              } else {
-                Toast.fail(res.text);
-              }
-            },err=> {
-              Toast.fail(err.text);
-            });
-          } else {
-            Toast.fail(res.text);
-          }
-        },
-        err => {
-          Toast.fail(err.text);
-        }
-      );
+    this.id = localStorage.id;
+    // this.code = '123'
+    if (this.code) {
+      if (this.id) {
+        this.getUserInfo(this.id);
+      } else {
+        getUserId({ code: this.code }).then(
+                res => {
+                  if (res.code === "200") {
+                    let userId = res.data.id;
+                    localStorage.id = userId;
+                    this.getUserInfo(userId);
+                  } else {
+                    Toast.fail(res.text);
+                  }
+                },
+                err => {
+                  Toast.fail(err.text);
+                }
+        );
+      }
+
     }
     /*else{
 			  setToken('38b47992-c8');
