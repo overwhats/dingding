@@ -119,6 +119,7 @@ export default {
   input {
     border: none !important;
     font-weight: 500;
+    color: #333;
   }
   ::-webkit-input-placeholder { /* WebKit browsers */
     color: #999;
