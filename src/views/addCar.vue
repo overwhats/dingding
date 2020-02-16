@@ -14,26 +14,26 @@
     </div>
     <div class="wrap">
       <div class="item title van-hairline--bottom"><span class="red">*</span>终点</div>
-      <div class="item wd van-hairline--bottom" @click="params.terminal = 1">
-        <div class="my-check" :class="{check: params.terminal == 1}"></div><span>总部</span>
+      <div class="item wd van-hairline--bottom" @click="params.endAddr = '总部'">
+        <div class="my-check" :class="{check: params.endAddr == '总部'}"></div><span>总部</span>
       </div>
-      <div class="item wd van-hairline--bottom" @click="params.terminal = 2">
-        <div class="my-check" :class="{check: params.terminal == 2}"></div><span>国创</span>
+      <div class="item wd van-hairline--bottom" @click="params.endAddr = '国创'">
+        <div class="my-check" :class="{check: params.endAddr == '国创'}"></div><span>国创</span>
       </div>
-      <div class="item wd van-hairline--bottom" @click="params.terminal = 3">
-        <div class="my-check" :class="{check: params.terminal == 3}"></div><span>4S店</span>
+      <div class="item wd van-hairline--bottom" @click="params.endAddr = '4S店'">
+        <div class="my-check" :class="{check: params.endAddr == '4S店'}"></div><span>4S店</span>
       </div>
     </div>
     <div class="wrap">
       <div class="item title van-hairline--bottom"><span class="red">*</span>车辆状态</div>
-      <div class="item wd van-hairline--bottom" @click="params.carState = 1, params.siteCnt = ''">
-        <div class="my-check" :class="{check: params.carState == 1}"></div><span>无空位</span>
+      <div class="item wd van-hairline--bottom" @click="params.status = 1, params.siteCnt = ''">
+        <div class="my-check" :class="{check: params.status == 1}"></div><span>无空位</span>
       </div>
-      <div class="item wd van-hairline--bottom" @click="params.carState = 0">
-        <div class="my-check" :class="{check: params.carState == 0}"></div><span>有空位</span>
+      <div class="item wd van-hairline--bottom" @click="params.status = 0">
+        <div class="my-check" :class="{check: params.status == 0}"></div><span>有空位</span>
         <div class="item wd wd-num van-hairline--bottom">
           <span>剩余可乘坐人数</span>
-          <input @blur="inputBlur" type="number" :disabled="params.carState == 1" v-model="params.siteCnt">
+          <input @blur="inputBlur" type="number" :disabled="params.status == 1" v-model="params.siteCnt">
           <span>人</span>
         </div>
       </div>
@@ -76,8 +76,8 @@ export default {
           startAddr: '',
           route: '',
           startArea: '武进区',
-          terminal: 1,
-          carState: 1,
+          endAddr: '总部',
+          status: 1,
           siteCnt: ''
         },
         edit: false,
@@ -88,7 +88,7 @@ export default {
         getCarListInfo({ unionId: localStorage.id }).then(
           res => {
             if (res.code === "200") {
-              if(res.data.type !== '') {
+              if(res.data.no !== '') {
                 this.edit = true
                 this.params = res.data
               }
@@ -133,7 +133,7 @@ export default {
           Toast('请填写出行路线');
           return
         }
-        if(this.carState== 0 && this.params.siteCnt == '') {
+        if(this.params.status == 0 && this.params.siteCnt == '') {
           Toast('请填写剩余可乘坐人数');
           return
         }
