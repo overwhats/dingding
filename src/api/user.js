@@ -22,7 +22,9 @@ const getUserId = (params) => get('/api/dingtalk/code', params);
 const carAdd = (params) => get('/api/car/add', params); // 添加车辆
 const getUserInfo = (params) => get('/api/user/get', params); // 添加车辆
 const getCarListInfo = (params) => get('/api/car/list', params); // 车辆信息-查询
+const userCommit = (params) => get('/api/user/commit', params); // 添加车辆
 export {
+	userCommit,
 	getUserInfo,
 	carAdd,
 	inviteeList,

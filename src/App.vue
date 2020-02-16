@@ -1,7 +1,11 @@
 <template>
   <div id="app">
     <!--<router-view/>-->
-    <van-button v-if="!code" type="info" size="small" class="login" @click="login">一 键 登 录</van-button>
+    <!--<van-button v-if="!code" type="info" size="small" class="login" @click="login">一 键 登 录</van-button>-->
+    <div v-if="!code" class="bac" >
+      <div class="btn"  @click="login"></div>
+      <img src="./assets/bac.png" alt="">
+    </div>
     <router-view v-else />
   </div>
 </template>
@@ -64,8 +68,8 @@ export default {
   },
   created() {
     this.code = getUrlParam("code");
-    this.code = 123;
-    if (this.code) {
+    this.code = '123';
+    if (this.code&& !localStorage.id) {
       getUserId({ code: this.code }).then(
         res => {
           if (res.code === "200") {
@@ -108,6 +112,29 @@ export default {
   font-size: 14px;
   min-height: 100vh;
   background-color: #F7F5F6;
+}
+.bac{
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  img{
+    position: absolute;
+    width: 100%;
+    left: 0;
+    top: 0;
+  }
+  .btn{
+    position: absolute;
+    width:300px;
+    height: 44px;
+    z-index: 10;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 305px;
+  }
 }
 body,
 html {

@@ -1,5 +1,7 @@
 <template>
   <div class="home">
+    <van-action-sheet v-model="showTarget" :actions="targetList" @select="selectTarget" />
+    <van-action-sheet v-model="showAddress" :actions="addressList" @select="selectAddress" />
     <div class="userInfo item">
       <div class="left"><span v-if="userInfo">{{userInfo.userName}}&nbsp;{{userInfo.userTel}}</span></div>
       <div class="right">{{now}}</div>
