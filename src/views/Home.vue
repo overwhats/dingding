@@ -25,7 +25,7 @@
             <div class="item wd wd-num van-hairline--bottom y-y">
                 <ul>
                     <li v-for="(item, index) in ycList" @click="yc(index)">
-                        <div :class="`fang my-check ${homeStatus? 'dis' : ''} ${item.check? 'check' : ''}`"></div>
+                        <div :class="`fang my-check  ${item.check? 'check' : ''}`"></div>
                         {{item.text}}
                     </li>
                 </ul>
@@ -57,7 +57,7 @@
             <div class="item wd wd-num van-hairline--bottom y-y">
                 <ul>
                     <li v-for="(item,index) in mgYcList" @click="mgYc(index)">
-                        <div :class="`fang my-check ${watchStatus? 'dis' : ''} ${item.check? 'check' : ''}`"></div>
+                        <div :class="`fang my-check  ${item.check? 'check' : ''}`"></div>
                         {{item.text}}
                     </li>
                 </ul>
@@ -82,24 +82,24 @@
         </div>
         <div class="wrap">
             <div class="item title van-hairline--bottom">用餐地点</div>
-            <div @click="lunchAddr='总部'" class="item wd van-hairline--bottom">
-                <div :class="`my-check  ${lunchAddr==='总部'? 'check' : ''}`"></div>
+            <div @click="selectAdr('总部')" class="item wd van-hairline--bottom">
+                <div :class="`my-check ${lunchEat&&lunchAddr==='总部'? 'check' : ''}  ${lunchEat===false? 'dis' : ''}`"></div>
                 总部
             </div>
-            <div @click="lunchAddr='国创'" class="item wd van-hairline--bottom">
-                <div :class="`my-check  ${lunchAddr==='国创'? 'check' : ''}`"></div>
+            <div @click="selectAdr('国创')" class="item wd van-hairline--bottom">
+                <div :class="`my-check  ${lunchEat&&lunchAddr==='国创'? 'check' : ''} ${lunchEat===false? 'dis' : ''}`"></div>
                 国创
             </div>
         </div>
         <div class="wrap">
             <div class="item title van-hairline--bottom"><span class="red"></span> 出行</div>
-            <div @click="tripType=1" class="item wd van-hairline--bottom btn-wrap">
-                <div style="display: flex"><div :class="`my-check ${tripType===1? 'check' : ''}`"></div><div>我开车上班<span class="notice">（愿意提供顺风车服务）</span></div></div>
+            <div class="item wd van-hairline--bottom btn-wrap">
+                <div  @click="tripType=1" style="display: flex"><div :class="`my-check ${tripType===1? 'check' : ''}`"></div><div>我开车上班<span class="notice">（愿意提供顺风车服务）</span></div></div>
                 <div @click="goAdd" class="btn">填写相关信息</div>
             </div>
             <!--<div  class="item wd van-hairline&#45;&#45;bottom btn-wrap child"><div @click="isSfc = !isSfc" style="display: flex;align-items: center"><div :class="`my-check ${tripType!==1? 'dis' : ''} ${isSfc&&tripType===1? 'check' : ''}`"></div><span>愿意提供顺风车服务</span></div> <div @click="goAdd" class="btn">填写相关信息</div></div>-->
-            <div @click="tripType=2" class="item wd van-hairline--bottom btn-wrap">
-                <div style="display: flex;align-items: center;">
+            <div  class="item wd van-hairline--bottom btn-wrap">
+                <div @click="tripType=2" style="display: flex;align-items: center;">
                     <div :class="`my-check ${tripType===2? 'check' : ''}`"></div>
                     <span>我要搭车</span></div>
                 <div class="btn" @click="goRoad">去搜索谁跟我顺路</div>
@@ -118,7 +118,7 @@
     import {Button, Toast, Checkbox, CheckboxGroup, Icon } from 'vant';
     import {getUrlParam} from '../utils/auth'
     import dayjs from 'dayjs'
-    import {inviteeList, inviteeLock, inviteeCommit, enableEvatation, userCommit} from '@/api/user'
+    import {inviteeList, inviteeLock, inviteeCommit, enableEvatation, userCommit, getUserInfo} from '@/api/user'
 
     vue.use(Button).use(Toast).use(Checkbox).use(Icon);
     export default {
@@ -151,6 +151,11 @@
             }
         },
         methods: {
+            selectAdr(type) {
+              if (this.lunchEat===false)return;
+              this.lunchAddr = type;
+              this.lunchEat = true;
+            },
             checkOk(type) {
                 if (type === 'jia') {
                     this.homeStatus = true;
@@ -195,6 +200,7 @@
                         watchTemp: this.watchTemp || '37.3',
                         watchStatus: str2.join(','),
                         lunchEat: this.lunchEat ? '1' : '0',
+                        lunchAddr: this.lunchEat===false ? '' : this.lunchAddr,
                         // lunchAddr: '国创',
                         // dinnerEat: this.dinnerEat ? '1': '0',
                         // dinnerAddr: '国创',
@@ -225,55 +231,79 @@
             },
             goRoad() {
                 this.$router.push('/road');
-            }
+            },
+            getUserInfo(userId) {
+                getUserInfo({unionId: userId, date: dayjs().format('YYYY-MM-DD')}).then(res => {
+                    if (res.code === "200") {
+                        try {
+                            localStorage.userInfo = JSON.stringify(res.data[0]);
+                        } catch (e) {
+                            Toast.fail('JSON解析错误');
+                            console.log(res.data, '错误数据');
+                        }
+                    } else {
+                        Toast.fail(res.text);
+                    }
+                },err=> {
+                    Toast.fail(err.text);
+                });
+            },
         },
-        mounted() {
-            this.userInfo = JSON.parse(localStorage.userInfo);
-            console.log(this.userInfo, '8888888');
-            if (this.userInfo.homeTemp > '37.3') {
-                this.homeStatus = false;
-            } else if (this.userInfo.homeTemp > 0) {
-                this.homeStatus = true;
-            }
-            if (this.userInfo.watchTemp > '37.3') {
-                this.watchStatus = false;
-            } else if (this.userInfo.watchTemp > 0) {
-                this.watchStatus = true;
-            }
-            if (this.userInfo.tripType === '我开车上班') {
-                this.tripType = 1;
-            } else if (this.userInfo.tripType === '我要搭车') {
-                this.tripType = 2;
-            } else if (this.userInfo.tripType === '其他方式') {
-                this.tripType = 3;
-            }
-            if (this.userInfo.lunchEat || this.userInfo.lunchEat == 0) {
-                this.lunchEat = this.userInfo.lunchEat ==='1'
-            }
-            if (this.userInfo.lunchAddr) {
-                this.lunchAddr = this.userInfo.lunchAddr
-            }
-            if(this.userInfo.homeStatus) {
-                let array = this.userInfo.homeStatus.split(',');
-                array.map(item => {
-                    this.ycList.forEach(item2 => {
-                        if(item === item2.text) {
-                            item2.check = true;
-                        }
-                    })
-                });
-            }
-            if(this.userInfo.watchStatus) {
-                let array = this.userInfo.watchStatus.split(',');
-                array.map(item => {
-                    this.mgYcList.forEach(item2 => {
-                        if(item === item2.text) {
-                            item2.check = true;
-                        }
-                    })
-                });
-            }
+        created() {
+            getUserInfo({unionId: localStorage.id, date: dayjs().format('YYYY-MM-DD')}).then(res=> {
+                if (res.code === "200") {
+                    this.userInfo = res.data[0];
+                    console.log(this.userInfo, '8888888');
+                    if (this.userInfo.homeTemp > '37.3') {
+                        this.homeStatus = false;
+                    } else if (this.userInfo.homeTemp > 0) {
+                        this.homeStatus = true;
+                    }
+                    if (this.userInfo.watchTemp > '37.3') {
+                        this.watchStatus = false;
+                    } else if (this.userInfo.watchTemp > 0) {
+                        this.watchStatus = true;
+                    }
+                    if (this.userInfo.tripType === '我开车上班') {
+                        this.tripType = 1;
+                    } else if (this.userInfo.tripType === '我要搭车') {
+                        this.tripType = 2;
+                    } else if (this.userInfo.tripType === '其他方式') {
+                        this.tripType = 3;
+                    }
+                    if (this.userInfo.lunchEat || this.userInfo.lunchEat == 0) {
+                        this.lunchEat = this.userInfo.lunchEat =='1'
+                    }
+                    if (this.userInfo.lunchAddr) {
+                        this.lunchAddr = this.userInfo.lunchAddr
+                    }
+                    if(this.userInfo.homeStatus) {
+                        let array = this.userInfo.homeStatus.split(',');
+                        array.map(item => {
+                            this.ycList.forEach(item2 => {
+                                if(item === item2.text) {
 
+                                    item2.check = true;
+                                }
+                            })
+                        });
+                    }
+                    if(this.userInfo.watchStatus) {
+                        let array = this.userInfo.watchStatus.split(',');
+                        array.map(item => {
+                            this.mgYcList.forEach(item2 => {
+                                if(item === item2.text) {
+                                    console.log(item2.text, item);
+                                    item2.check = true;
+                                }
+                            })
+                        });
+                    }
+                } else {
+                    Toast.fail(res.text);
+                }
+
+            });
         },
     }
 </script>
@@ -447,7 +477,7 @@
     }
 
     .dis {
-        /*background: #eee;*/
+        background: #eee;
     }
 
     .my-check.check {
