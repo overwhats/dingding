@@ -5,7 +5,7 @@
             <div class="right">{{now}}</div>
         </div>
         <div class="wrap">
-            <div class="item title van-hairline--bottom"><span class="red">*</span>今日在家检测</div>
+            <div class="item title van-hairline--bottom"><span class="red"></span>今日在家检测</div>
             <div @click="checkOk('jia')" class="item wd van-hairline--bottom">
                 <div :class="`my-check ${homeStatus? 'check' : ''}`"></div>
                 正常&nbsp; ≤37.3度
@@ -32,7 +32,7 @@
             </div>
         </div>
         <div class="wrap">
-            <div class="item title van-hairline--bottom"><span class="red">*</span>今日门岗检测</div>
+            <div class="item title van-hairline--bottom"><span class="red"></span>今日门岗检测</div>
             <div @click="checkOk('gang')" class="item wd van-hairline--bottom">
                 <div :class="`my-check ${watchStatus? 'check' : ''}`"></div>
                 正常&nbsp; ≤37.3度
@@ -64,7 +64,7 @@
             </div>
         </div>
         <div class="wrap">
-            <div class="item title van-hairline--bottom" style="display: block;"><span class="red">*</span> 是否预定明日午餐 <div>最晚预定时间为当日17点，请及时提交，否则会影响用餐。</div></div>
+            <div class="item small-notice title van-hairline--bottom" ><div><span class="red"></span> 是否预定明日午餐 <div class="n-n"><van-icon name="info-o" />最晚预定时间为当日17点，请及时提交，否则会影响用餐。</div></div></div>
             <div @click="lunchEat=true" class="item wd van-hairline--bottom">
                 <div :class="`my-check ${lunchEat? 'check' : ''}`"></div>
                 是
@@ -81,7 +81,18 @@
             <!--</div>-->
         </div>
         <div class="wrap">
-            <div class="item title van-hairline--bottom"><span class="red">*</span> 出行</div>
+            <div class="item title van-hairline--bottom">用餐地点</div>
+            <div @click="lunchAddr='总部'" class="item wd van-hairline--bottom">
+                <div :class="`my-check  ${lunchAddr==='总部'? 'check' : ''}`"></div>
+                总部
+            </div>
+            <div @click="lunchAddr='国创'" class="item wd van-hairline--bottom">
+                <div :class="`my-check  ${lunchAddr==='国创'? 'check' : ''}`"></div>
+                国创
+            </div>
+        </div>
+        <div class="wrap">
+            <div class="item title van-hairline--bottom"><span class="red"></span> 出行</div>
             <div @click="tripType=1" class="item wd van-hairline--bottom btn-wrap">
                 <div style="display: flex"><div :class="`my-check ${tripType===1? 'check' : ''}`"></div><div>我开车上班<span class="notice">（愿意提供顺风车服务）</span></div></div>
                 <div @click="goAdd" class="btn">填写相关信息</div>
@@ -104,17 +115,18 @@
 
 <script>
     import vue from 'vue';
-    import {Button, Toast, Checkbox, CheckboxGroup} from 'vant';
+    import {Button, Toast, Checkbox, CheckboxGroup, Icon } from 'vant';
     import {getUrlParam} from '../utils/auth'
     import dayjs from 'dayjs'
     import {inviteeList, inviteeLock, inviteeCommit, enableEvatation, userCommit} from '@/api/user'
 
-    vue.use(Button).use(Toast).use(Checkbox).use(CheckboxGroup);
+    vue.use(Button).use(Toast).use(Checkbox).use(Icon);
     export default {
         name: 'home',
         components: {},
         data() {
             return {
+                lunchAddr: '',
                 userInfo: {},
                 checked: true,
                 isSfc: true,
@@ -167,9 +179,9 @@
                 let str2 = list2.map(item => {
                     return item.text;
                 });
-                if ((!this.homeStatus) && this.homeTemp === '') {
+                if ((this.homeStatus === false) && this.homeTemp === '') {
                     Toast('请输入在家体温')
-                } else if ((!this.watchStatus) && this.watchTemp === '') {
+                } else if ((this.watchStatus === false) && this.watchTemp === '') {
                     Toast('请输入门岗体温')
                 } else if (this.homeTemp !== '' && isNaN(this.homeTemp)) {
                     Toast('在家体温格式错误');
@@ -182,11 +194,11 @@
                         homeStatus: str1.join(','),
                         watchTemp: this.watchTemp || '37.3',
                         watchStatus: str2.join(','),
-                        lunchEat: this.lunchEat ? 1 : 0,
+                        lunchEat: this.lunchEat ? '1' : '0',
                         // lunchAddr: '国创',
-                        // dinnerEat: this.dinnerEat ? 1: 0,
+                        // dinnerEat: this.dinnerEat ? '1': '0',
                         // dinnerAddr: '国创',
-                        tripType: this.tripType === 1 ? "我开车上班" : (this.tripType === 2 ? '我要搭车' : '其他方式')
+                        tripType: this.tripType ===1 ? "我开车上班" : (this.tripType ===2 ? '我要搭车' : '其他方式')
                     }).then(res => {
                             if (res.code === "200") {
                                 Toast.success('提交成功');
@@ -217,10 +229,69 @@
         },
         mounted() {
             this.userInfo = JSON.parse(localStorage.userInfo);
+            console.log(this.userInfo, '8888888');
+            if (this.userInfo.homeTemp > '37.3') {
+                this.homeStatus = false;
+            } else if (this.userInfo.homeTemp > 0) {
+                this.homeStatus = true;
+            }
+            if (this.userInfo.watchTemp > '37.3') {
+                this.watchStatus = false;
+            } else if (this.userInfo.watchTemp > 0) {
+                this.watchStatus = true;
+            }
+            if (this.userInfo.tripType === '我开车上班') {
+                this.tripType = 1;
+            } else if (this.userInfo.tripType === '我要搭车') {
+                this.tripType = 2;
+            } else if (this.userInfo.tripType === '其他方式') {
+                this.tripType = 3;
+            }
+            if (this.userInfo.lunchEat || this.userInfo.lunchEat == 0) {
+                this.lunchEat = this.userInfo.lunchEat ==='1'
+            }
+            if (this.userInfo.lunchAddr) {
+                this.lunchAddr = this.userInfo.lunchAddr
+            }
+            if(this.userInfo.homeStatus) {
+                let array = this.userInfo.homeStatus.split(',');
+                array.map(item => {
+                    this.ycList.forEach(item2 => {
+                        if(item === item2.text) {
+                            item2.check = true;
+                        }
+                    })
+                });
+            }
+            if(this.userInfo.watchStatus) {
+                let array = this.userInfo.watchStatus.split(',');
+                array.map(item => {
+                    this.mgYcList.forEach(item2 => {
+                        if(item === item2.text) {
+                            item2.check = true;
+                        }
+                    })
+                });
+            }
+
         },
     }
 </script>
 <style scoped lang="scss">
+    .small-notice{
+        text-align: left;
+        height: 68px!important;
+        .n-n{
+            color: #3296FA;
+            font-size: 12px;
+            padding-top: 6px;
+            display: flex;
+            align-items: center;
+            i{
+                padding-right: 2px;
+            }
+        }
+    }
     .y-y{
         padding-left: 15px!important;
     }

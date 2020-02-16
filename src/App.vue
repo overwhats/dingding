@@ -6,7 +6,9 @@
       <div class="btn"  @click="login"></div>
       <img src="./assets/bac.png" alt="">
     </div>
-    <router-view v-else />
+    <template v-else>
+      <keep-alive><router-view/></keep-alive>
+    </template>
   </div>
 </template>
 <script>
@@ -68,7 +70,17 @@ export default {
   },
   created() {
     this.code = getUrlParam("code");
-    this.code = '123';
+    // this.code= 'uj16ewmjWSQutKkWNSiPBXAiEiE'
+    // getUserInfo({unionId: this.code, date: dayjs().format('YYYYMMDD')}).then(res => {
+    //   if (res.code === "200") {
+    //     localStorage.userInfo = JSON.stringify(res.data[0]);
+    //   } else {
+    //     Toast.fail(res.text);
+    //   }
+    // },err=> {
+    //   Toast.fail(err.text);
+    // });
+    // return;
     if (this.code&& !localStorage.id) {
       getUserId({ code: this.code }).then(
         res => {
