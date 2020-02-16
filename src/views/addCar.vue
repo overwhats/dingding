@@ -7,7 +7,7 @@
     <div class="wrap">
       <div class="item wd van-hairline--bottom input-wrap"><div><span class="red">*</span>车牌</div><input @blur="inputBlur" placeholder="请填写车牌" type="text" v-model="params.no"></div>
       <div class="item wd van-hairline--bottom input-wrap"><div><span class="red">*</span>车辆颜色</div><input @blur="inputBlur" placeholder="请填写颜色" type="text" v-model="params.color"></div>
-      <div class="item wd van-hairline--bottom input-wrap"><div><span class="red">*</span>手机号</div><span style="color: #333333">{{userInfo ? userInfo.userTel : ''}}</span></div>
+      <div class="item wd van-hairline--bottom input-wrap"><div><span class="red">*</span>手机号</div><input @blur="inputBlur" placeholder="请填写手机号" type="text" v-model="params.userTel"></div>
       <div class="item wd van-hairline--bottom input-wrap" @click="showAreaPicker = true"><div><span class="red">*</span>起点</div><div style="color: #333333;display: flex;align-items: center;">{{params.startArea}}<van-icon name="arrow" /></div></div>
       <div class="item wd van-hairline--bottom input-wrap input-line"><input @blur="inputBlur" placeholder="请填写具体地址" type="text" v-model="params.startAddr"></div>
       <div class="item wd van-hairline--bottom input-wrap"><div><span class="red">*</span>出行路线</div><textarea v-model="params.route" placeholder="请描述你经过的关键性道路，用逗号隔开如：中吴大道，龙江路高架，常武路" type="text"></textarea></div>
@@ -125,6 +125,10 @@ export default {
           Toast('请填写颜色');
           return
         }
+        if(this.params.userTel == '') {
+          Toast('请填写手机号');
+          return
+        }
         if(this.params.startAddr == '') {
           Toast('请填写具体地址');
           return
@@ -137,6 +141,7 @@ export default {
           Toast('请填写剩余可乘坐人数');
           return
         }
+        this.params.unionId = localStorage.id || ''
         console.log(this.params)
         carAdd({...this.params}).then(
           res => {
@@ -162,11 +167,20 @@ export default {
         //   unionId: 'uj16ewmjWSQutKkWNSiPBXAiEiE',
         //   userTel: '12333333333'
         // }
+        this.userInfo ? this.params.userTel = this.userInfo.userTel : ''
         console.log(this.userInfo)
     },
 }
 </script>
 <style scoped lang="scss">
+  input {
+    font-weight: 500;
+  }
+  ::-webkit-input-placeholder { /* WebKit browsers */
+    color: #999;
+    font-size: 14px;
+    font-weight: 400 !important;
+  }
   .item{
     background: #fff;
     min-height: 44px;
