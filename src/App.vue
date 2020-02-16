@@ -2,7 +2,7 @@
   <div id="app">
     <!--<router-view/>-->
     <!--<van-button v-if="!code" type="info" size="small" class="login" @click="login">一 键 登 录</van-button>-->
-    <div v-if="code" class="bac" >
+    <div v-if="!code" class="bac" >
       <div class="btn"  @click="login"></div>
       <img src="./assets/bac.png" alt="">
     </div>
