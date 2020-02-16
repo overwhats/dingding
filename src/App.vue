@@ -70,7 +70,7 @@ export default {
   },
   created() {
     this.code = getUrlParam("code");
-    // this.code= 'uj16ewmjWSQutKkWNSiPBXAiEiE'
+    this.code= 'uj16ewmjWSQutKkWNSiPBXAiEiE'
     // getUserInfo({unionId: this.code, date: dayjs().format('YYYYMMDD')}).then(res => {
     //   if (res.code === "200") {
     //     localStorage.userInfo = JSON.stringify(res.data[0]);

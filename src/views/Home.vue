@@ -155,15 +155,15 @@
                 if (type === 'jia') {
                     this.homeStatus = true;
                     this.homeTemp = '';
-                    this.ycList.forEach(item => {
-                        item.check = false;
-                    })
+                    // this.ycList.forEach(item => {
+                    //     item.check = false;
+                    // })
                 } else {
                     this.watchStatus = true;
                     this.watchTemp = '';
-                    this.mgYcList.forEach(item => {
-                        item.check = false;
-                    })
+                    // this.mgYcList.forEach(item => {
+                    //     item.check = false;
+                    // })
                 }
             },
             submit() {
