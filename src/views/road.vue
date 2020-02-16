@@ -13,7 +13,7 @@
       <li v-for="(it, i) in carList" :key="i">
         <div>
           <div class="top-line"><span>{{it.startArea}}</span>&nbsp;{{it.startAddr}}</div>
-          <div class="bottom-line">{{it.userName}}&nbsp;{{it.userTel}}&nbsp;{{it.no}}&nbsp;{{it.color}}&nbsp;{{it.endAddr}}</div>
+          <div class="bottom-line">{{it.userName}}&nbsp;<a style="color: #333;" :href='`tel:${it.userTel}`'>{{it.userTel}}</a>&nbsp;{{it.no}}&nbsp;{{it.color}}&nbsp;{{it.endAddr}}</div>
         </div>
       </li>
     </ul>
@@ -118,6 +118,12 @@ export default {
 <style scoped lang="scss">
   input {
     border: none !important;
+    font-weight: 500;
+  }
+  ::-webkit-input-placeholder { /* WebKit browsers */
+    color: #999;
+    font-size: 14px;
+    font-weight: 400 !important;
   }
   .item{
     background: #fff;
