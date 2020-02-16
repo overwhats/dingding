@@ -9,7 +9,7 @@
     <div class="wrap">
       <div class="item wd van-hairline--bottom input-wrap" @click="showStartPicker = true"><div><span class="red">*</span>出发地</div><div style="color: #333333;display: flex;align-items: center;">{{params.startArea}}<van-icon name="arrow" /></div></div>
       <div class="item wd van-hairline--bottom input-wrap" @click="showTerminalPicker = true"><div><span class="red">*</span>目的地</div><div style="color: #333333;display: flex;align-items: center;">{{params.endAddr}}<van-icon name="arrow" /></div></div>
-      <div class="item wd van-hairline--bottom search-wrap"><input v-model="params.startAddr" placeholder="请输入地址" type="text"> <div class="search-btn" @click="search">查询</div></div>
+      <div class="item wd van-hairline--bottom search-wrap"><input @blur="inputBlur" v-model="params.startAddr" placeholder="请输入地址" type="text"> <div class="search-btn" @click="search">查询</div></div>
     </div>
     <ul class="address-list" v-if="carList.length > 0">
       <li v-for="(it, i) in carList" :key="i">
@@ -74,6 +74,22 @@ export default {
       onTerminalSelect (item) {
         this.showTerminalPicker = false;
         this.params.endAddr = item.name
+      },
+      inputBlur () {
+        setTimeout(() => {
+          if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') {
+            return
+          }
+          let result = 'pc';
+          if (/(iPhone|iPad|iPod|iOS)/i.test(navigator.userAgent)) { // 判断iPhone|iPad|iPod|iOS
+            result = 'ios'
+          } else if (/(Android)/i.test(navigator.userAgent)) { // 判断Android
+            result = 'android'
+          }
+          if (result === 'ios') {
+            document.activeElement.scrollIntoViewIfNeeded(true);
+          }
+        }, 100)
       },
       search () {
         getCarListInfo({...this.params}).then(

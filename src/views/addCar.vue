@@ -5,11 +5,11 @@
       <div class="right">{{now}}</div>
     </div>
     <div class="wrap">
-      <div class="item wd van-hairline--bottom input-wrap"><div><span class="red">*</span>车牌</div><input placeholder="请填写车牌" type="text" v-model="params.no"></div>
-      <div class="item wd van-hairline--bottom input-wrap"><div><span class="red">*</span>车辆颜色</div><input placeholder="请填写颜色" type="text" v-model="params.color"></div>
+      <div class="item wd van-hairline--bottom input-wrap"><div><span class="red">*</span>车牌</div><input @blur="inputBlur" placeholder="请填写车牌" type="text" v-model="params.no"></div>
+      <div class="item wd van-hairline--bottom input-wrap"><div><span class="red">*</span>车辆颜色</div><input @blur="inputBlur" placeholder="请填写颜色" type="text" v-model="params.color"></div>
       <div class="item wd van-hairline--bottom input-wrap"><div><span class="red">*</span>手机号</div><span style="color: #333333">{{userInfo ? userInfo.userTel : ''}}</span></div>
       <div class="item wd van-hairline--bottom input-wrap" @click="showAreaPicker = true"><div><span class="red">*</span>起点</div><div style="color: #333333;display: flex;align-items: center;">{{params.startArea}}<van-icon name="arrow" /></div></div>
-      <div class="item wd van-hairline--bottom input-wrap"><span></span><input placeholder="请填写具体地址" type="text" v-model="params.startAddr"></div>
+      <div class="item wd van-hairline--bottom input-wrap"><span></span><input @blur="inputBlur" placeholder="请填写具体地址" type="text" v-model="params.startAddr"></div>
       <div class="item wd van-hairline--bottom input-wrap"><div><span class="red">*</span>出行路线</div><textarea v-model="params.route" placeholder="请描述你经过的关键性道路，用逗号隔开如：中吴大道，龙江路高架，常武路" type="text"></textarea></div>
     </div>
     <div class="wrap">
@@ -33,7 +33,7 @@
         <div class="my-check" :class="{check: params.carState == 0}"></div><span>有空位</span>
         <div class="item wd wd-num van-hairline--bottom">
           <span>剩余可乘坐人数</span>
-          <input type="number" :disabled="params.carState == 1" v-model="params.siteCnt">
+          <input @blur="inputBlur" type="number" :disabled="params.carState == 1" v-model="params.siteCnt">
           <span>人</span>
         </div>
       </div>
@@ -99,6 +99,22 @@ export default {
       onAreaSelect (item) {
         this.showAreaPicker = false;
         this.params.startArea = item.name
+      },
+      inputBlur () {
+        setTimeout(() => {
+          if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') {
+            return
+          }
+          let result = 'pc';
+          if (/(iPhone|iPad|iPod|iOS)/i.test(navigator.userAgent)) { // 判断iPhone|iPad|iPod|iOS
+            result = 'ios'
+          } else if (/(Android)/i.test(navigator.userAgent)) { // 判断Android
+            result = 'android'
+          }
+          if (result === 'ios') {
+            document.activeElement.scrollIntoViewIfNeeded(true);
+          }
+        }, 100)
       },
       submit () {
         if(this.params.no == '') {
