@@ -288,6 +288,8 @@ export default {
       text-align: right;
       margin-left: 20px;
       border:none !important;
+      color: #333;
+      font-weight: 500;
     }
   }
   .my-check{
