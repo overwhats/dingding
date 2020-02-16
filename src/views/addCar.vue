@@ -33,7 +33,7 @@
         <div class="my-check" :class="{check: params.status == 0}"></div><span>有空位</span>
         <div class="item wd wd-num van-hairline--bottom">
           <span>剩余可乘坐人数</span>
-          <input @blur="inputBlur" type="number" :disabled="params.status == 1" v-model="params.siteCnt">
+          <input style="text-align: center;" @blur="inputBlur" type="number" :disabled="params.status == 1" v-model="params.siteCnt">
           <span>人</span>
         </div>
       </div>
@@ -167,7 +167,7 @@ export default {
         //   unionId: 'uj16ewmjWSQutKkWNSiPBXAiEiE',
         //   userTel: '12333333333'
         // }
-        this.userInfo ? this.params.userTel = this.userInfo.userTel : ''
+        this.userInfo ? (this.params.userTel = this.userInfo.userTel) : ''
         console.log(this.userInfo)
     },
 }
@@ -286,6 +286,9 @@ export default {
       text-align: right;
       margin-left: 20px;
       border:none !important;
+      color: #333;
+      font-weight: 500;
+      height: 45px;
     }
   }
   .my-check{
