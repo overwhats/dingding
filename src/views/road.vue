@@ -14,6 +14,7 @@
         <div>
           <div class="top-line"><span>{{it.startArea}}</span>&nbsp;{{it.startAddr}}</div>
           <div class="bottom-line">{{it.userName}}&nbsp;<a style="color: #333;" :href='`tel:${it.userTel}`'>{{it.userTel}}</a>&nbsp;{{it.no}}&nbsp;{{it.color}}&nbsp;{{it.endAddr}}</div>
+          <div class="route" v-if="it.route">({{it.route}})</div>
         </div>
       </li>
     </ul>
@@ -244,6 +245,10 @@ export default {
   }
   .address-list{
     margin-top: 10px;
+    .route {
+      font-size: 12px;
+      color: grey;
+    }
   }
   .address-list li{
     display: flex;
