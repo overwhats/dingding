@@ -14,7 +14,7 @@
         <div>
           <div class="top-line"><span>{{it.startArea}}</span>&nbsp;{{it.startAddr}}</div>
           <div class="bottom-line">{{it.userName}}&nbsp;<a style="color: #333;" :href='`tel:${it.userTel}`'>{{it.userTel}}</a>&nbsp;{{it.no}}&nbsp;{{it.color}}&nbsp;{{it.endAddr}}</div>
-          <div class="route" v-if="it.route">({{it.route}})</div>
+          <div class="route" v-if="it.route">(出行路线：{{it.route}})</div>
         </div>
       </li>
     </ul>
