@@ -19,17 +19,19 @@
                     <input :disabled="homeStatus" v-model="homeTemp" type="number">
                     <span>度</span></div>
             </div>
-            <div class="item van-hairline--bottom">
-                <div class="question">是否存在以下症状？</div>
-            </div>
-            <div class="item wd wd-num van-hairline--bottom y-y">
-                <ul>
-                    <li v-for="(item, index) in ycList" @click="yc(index)">
-                        <div :class="`fang my-check  ${item.check? 'check' : ''}`"></div>
-                        {{item.text}}
-                    </li>
-                </ul>
-            </div>
+            <template >
+                <div  class="item van-hairline--bottom">
+                    <div class="question">是否存在以下症状？<span>（没有则无需选择）</span></div>
+                </div>
+                <div class="item wd wd-num van-hairline--bottom y-y">
+                    <ul>
+                        <li v-for="(item, index) in ycList" @click="yc(index)">
+                            <template v-if="!(item.text==='其他'&&homeStatus===true)"><div :class="`fang my-check  ${item.check? 'check' : ''}`"></div>{{item.text}}</template>
+                        </li>
+                    </ul>
+                </div>
+            </template>
+
         </div>
         <div class="wrap">
             <div class="item title van-hairline--bottom"><span class="red"></span>今日门岗检测</div>
@@ -51,17 +53,18 @@
             <!--<input v-model="watchTemp" :disabled="watchStatus" type="number">-->
             <!--<span>度</span>-->
             <!--</div>-->
-            <div class="item van-hairline--bottom">
-                <div class="question">是否存在以下症状？</div>
-            </div>
-            <div class="item wd wd-num van-hairline--bottom y-y">
-                <ul>
-                    <li v-for="(item,index) in mgYcList" @click="mgYc(index)">
-                        <div :class="`fang my-check  ${item.check? 'check' : ''}`"></div>
-                        {{item.text}}
-                    </li>
-                </ul>
-            </div>
+            <template >
+                <div  class="item van-hairline--bottom">
+                    <div class="question">是否存在以下症状？<span>（没有则无需选择）</span></div>
+                </div>
+                <div class="item wd wd-num van-hairline--bottom y-y">
+                    <ul>
+                        <li v-for="(item,index) in mgYcList" @click="mgYc(index)">
+                            <template v-if="!(item.text==='其他'&&watchStatus===true)"><div :class="`fang my-check  ${item.check? 'check' : ''}`"></div>{{item.text}}</template>
+                        </li>
+                    </ul>
+                </div>
+            </template>
         </div>
         <div class="wrap">
             <div class="item small-notice title van-hairline--bottom" ><div><span class="red"></span> 是否预定明日午餐 <div class="n-n"><van-icon name="info-o" />最晚预定时间为当日17点，请及时提交，否则会影响用餐。</div></div></div>
@@ -188,10 +191,10 @@
             },
             submit() {
                 let list1 = this.ycList.filter(item => {
-                    return item.check;
+                    return item.check&&!(this.homeStatus&&item.text==='其他');
                 });
                 let list2 = this.mgYcList.filter(item => {
-                    return item.check;
+                    return item.check&&!(this.watchStatus&&item.text==='其他');
                 });
                 let str1 = list1.map(item => {
                     return item.text;
@@ -207,12 +210,14 @@
                     Toast('在家体温格式错误');
                 } else if (this.watchTemp !== '' && isNaN(this.watchTemp)) {
                     Toast('门岗体温格式错误');
+                } else if (this.homeStatus === ''&&this.watchStatus===''&&str1.join(',')===''&&str2.join(',')===''&&this.lunchEat===''&&this.lunchAddr==='') {
+                    Toast('请填写信息后进行提交');
                 } else {
                     userCommit({
                         unionId: localStorage.id,
-                        homeTemp: this.homeTemp || '',
+                        homeTemp: this.homeStatus? '37.3': (this.homeTemp || ''),
                         homeStatus: str1.join(','),
-                        watchTemp: this.watchTemp || '',
+                        watchTemp: this.watchStatus ? '37.3' : (this.watchTemp || ''),
                         watchStatus: str2.join(','),
                         lunchEat: this.lunchEat ===true ? '1' : this.lunchEat === false ? '0' : '',
                         lunchAddr: this.lunchEat===false ? '' : this.lunchAddr,
@@ -253,7 +258,15 @@
                         this.userInfo = res.data[0];
                         localStorage.userInfo = JSON.stringify(res.data[0]);
                         console.log(this.userInfo, '8888888');
-
+                        // this.userInfo = {
+                        //     homeTemp: null,
+                        //     watchTemp: null,
+                        //     tripType: null,
+                        //     lunchEat: null,
+                        //     lunchAddr: null,
+                        //     homeStatus: null,
+                        //     watchStatus: null
+                        // }
                         if (this.userInfo.homeTemp > '37.3') {
                             this.homeTemp = this.userInfo.homeTemp;
                             this.homeStatus = false;
@@ -339,6 +352,9 @@
         font-size: 15px;
         color: #333;
         padding-left: 15px;
+        span{
+            font-size: 12px;
+        }
     }
     .y-wd-wrap {
         display: flex;

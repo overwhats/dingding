@@ -3,13 +3,13 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 import '@/icons'
-import Vconsole from 'vconsole'
+// import Vconsole from 'vconsole'
 /*import {getUserId,enableEvatation} from '@/api/user'
 import {getUrlParam,setToken} from '@/utils/auth'
 import vue from 'vue';
 import { Button,Toast} from 'vant';*/
-let vConsole = new Vconsole()
-Vue.use(vConsole)
+// let vConsole = new Vconsole()
+// Vue.use(vConsole)
 Vue.config.productionTip = false;
 (function (baseFontSize) {
 	const _baseFontSize = baseFontSize || 75;
