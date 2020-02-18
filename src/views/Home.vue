@@ -227,7 +227,8 @@
                         tripType: this.tripType ===1 ? "我开车上班" : (this.tripType ===2 ? '我要搭车' : this.tripType === 3? '其他方式':'')
                     }).then(res => {
                             if (res.code === "200") {
-                                Toast.success('提交成功');
+                                this.$router.push('/submitSuccess')
+                                // Toast.success('提交成功');
                             } else {
                                 Toast.fail(res.text);
                             }

@@ -13,6 +13,11 @@ export default new Router({
 			component: Home
 		},
 		{
+			path: '/submitSuccess',
+			name: 'submitSuccess',
+			component: () => import('./views/submitSuccess.vue')
+		},
+		{
 			path: '/addCar',
 			name: 'addCar',
 			// route level code-splitting
