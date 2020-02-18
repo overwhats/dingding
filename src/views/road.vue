@@ -251,11 +251,12 @@ export default {
     }
   }
   .address-list li{
+    padding: 16px 0;
     display: flex;
     align-items: center;
     text-align: left;
     background: #fff;
-    height: 66px;
+    min-height: 34px;
     margin: 0 12px;
     padding-left: 17px;
     margin-bottom: 7px;
